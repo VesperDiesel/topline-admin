@@ -1,5 +1,5 @@
 <template>
-  <div>
+
     <div class="login-wrap">
       <!-- 给组件加 class，会把这个 class 作用到组件的根元素上 -->
       <div class="form-wrap">
@@ -12,7 +12,7 @@
           </el-form-item>
           <el-form-item>
             <el-col :offset="1" :span="9">
-              <el-button>获取验证码</el-button>
+              <el-button @click='handleSendCode'>获取验证码</el-button>
             </el-col>
           </el-form-item>
           <el-form-item>
@@ -21,10 +21,10 @@
         </el-form>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'AppLogin',
   props: [''],
@@ -48,6 +48,15 @@ export default {
   methods: {
     onSubmit () {
       console.log('submit!')
+    },
+    handleSendCode () {
+      const { mobile } = this.form
+      axios({
+        method: 'GET',
+        url: `http://ttapi.research.itcast.cn/mp/v1_0/captchas/${mobile}`
+      }).then(res => {
+        console.log(res.data)
+      })
     }
   }
 }
