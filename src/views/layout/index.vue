@@ -10,7 +10,9 @@
         <AppHeader/>
       </el-header>
       <!-- 内容 -->
-      <el-main>Main</el-main>
+      <el-main>
+        <router-></router->
+      </el-main>
     </el-container>
   </el-container>
 </template>
