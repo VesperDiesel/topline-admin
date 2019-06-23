@@ -16,7 +16,7 @@
             <el-input v-model="form.code" placeholder="验证码"></el-input>
           </el-col>
           <el-col :offset="1" :span="9">
-            <el-button @click="handleSendCode">获取验证码</el-button>
+            <el-button @click="handleSendCode" :disabled="!!codeTimer">{{codeTimer ? `剩余${codeTimeSeconds秒}` : '获取验证码'}}</el-button>
           </el-col>
         </el-form-item>
         <el-form-item prop="agree">
@@ -34,6 +34,7 @@
 <script>
 import axios from 'axios'
 import '@/vendor/gt'
+const initCodeTimeSeconds = 60
 export default {
   name: 'AppLogin',
   props: [''],
@@ -57,7 +58,9 @@ export default {
           { required: true, message: '请同意用户协议' },
           { pattern: /true/, message: '请同意用户协议' }
         ]
-      }
+      },
+      codeTimer: null,
+      codeTimeSeconds: initCodeTimeSeconds
     }
   },
 
@@ -127,11 +130,11 @@ export default {
           offline: !data.success,
           new_captcha: data.new_captcha,
           product: 'bind' // 隐藏，直接弹出式
-        }, function (captchaObj) {
-          captchaObj.onReady(function () {
+        }, captchaObj => {
+          captchaObj.onReady(() => {
             // 验证码ready之后才能调用verify方法显示验证码
             captchaObj.verify() // 弹出验证码内容框
-          }).onSuccess(function () {
+          }).onSuccess(() => {
             // your code
             // console.log(captchaObj.getValidate())
             const {
@@ -148,7 +151,8 @@ export default {
                 seccode
               }
             }).then(res => {
-              console.log(res.data)
+              // console.log(res.data)
+              this.codeCountDown()
             })
           }).onError(function () {
             // your code
@@ -157,6 +161,16 @@ export default {
           // captchaObj.verify
         })
       })
+    },
+    codeCountDown () {
+      this.codeTimer = window.setInterval(() => {
+        this.codeTimeSeconds--
+        if (this.codeTimeSeconds <= 0) {
+          window.clearInterval(this.codeTimer)
+          this.codeTimeSeconds = initCodeTimeSeconds
+          this.codeTimer = null
+        }
+      }, 1000)
     }
   }
 }
