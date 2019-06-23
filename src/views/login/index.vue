@@ -19,6 +19,10 @@
             <el-button @click="handleSendCode">获取验证码</el-button>
           </el-col>
         </el-form-item>
+        <el-form-item prop="agree">
+          <el-checkbox class="agree-checkbox" v-model="form.agree"></el-checkbox>
+          <span class="agree-text">我已阅读并同意<a href="#">用户协议</a>和<a href="#">隐私条款</a></span>
+        </el-form-item>
         <el-form-item>
           <el-button class="btn-login" type="primary" @click="handleLogin">登录</el-button>
         </el-form-item>
@@ -37,7 +41,8 @@ export default {
     return {
       form: {
         mobile: '',
-        code: ''
+        code: '',
+        agree: ''
       },
       rules: {
         mobile: [
@@ -47,6 +52,10 @@ export default {
         code: [
           { required: true, message: '请输入验证码', trigger: 'blur' },
           { pattern: /^d{6}&/, message: '请输入有效的验证码', trigger: 'blur' }
+        ],
+        agree: [
+          { required: true, message: '请同意用户协议' },
+          { pattern: /true/, message: '请同意用户协议' }
         ]
       }
     }
@@ -88,6 +97,14 @@ export default {
       })
     },
     handleSendCode () {
+      this.$refs['form'].validateField('mobile', errorMessage => {
+        if (errorMessage.trim().length > 0) {
+          return
+        }
+        this.showGeetest()
+      })
+    },
+    showGeetest () {
       const { mobile } = this.form
       axios({
         method: 'GET',
@@ -169,5 +186,12 @@ export default {
       width: 100%;
     }
   }
+  .agree-checkbox {
+      margin-right: 10px;
+    }
+    .agree-text {
+      font-size: 16px;
+      color: #999;
+    }
 }
 </style>
