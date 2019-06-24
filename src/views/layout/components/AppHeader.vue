@@ -17,7 +17,7 @@
 </template>
 
 <script>
-
+import { removeUser, getUser } from '@/utils/auth'
 export default {
   name: 'AppHeader',
   props: [''],
@@ -27,7 +27,7 @@ export default {
     }
   },
   created () {
-    this.userInfo = JSON.parse(window.localStorage.getItem('user_info'))
+    this.userInfo = getUser()
   },
   components: {},
 
@@ -44,7 +44,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        window.localStorage.removeItem('user_info')
+        removeUser()
         this.$router.push({ name: 'login' })
         this.$message({
           type: 'success',

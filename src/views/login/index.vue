@@ -34,6 +34,7 @@
 <script>
 import axios from 'axios'
 import '@/vendor/gt'
+import { saveUser } from '@/utils/auth'
 const initCodeTimeSeconds = 60
 export default {
   name: 'AppLogin',
@@ -89,7 +90,7 @@ export default {
       }).then(res => {
         // console.log(res.data)
         const userInfo = res.data.data
-        window.localStorage.setItem('user_info', JSON.stringify(userInfo))
+        saveUser(userInfo)
         this.$message({
           message: '登录成功',
           type: 'success'
