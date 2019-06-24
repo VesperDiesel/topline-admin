@@ -11,7 +11,7 @@
       </el-header>
       <!-- 内容 -->
       <el-main>
-        <router-></router->
+        <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
@@ -21,7 +21,7 @@
 import AppAside from './components/AppAside'
 import AppHeader from './components/AppHeader'
 export default {
-  name: 'AppLayot',
+  name: 'AppLayout',
   props: [''],
   components: {
     AppAside,

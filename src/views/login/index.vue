@@ -16,7 +16,7 @@
             <el-input v-model="form.code" placeholder="验证码"></el-input>
           </el-col>
           <el-col :offset="1" :span="9">
-            <el-button @click="handleSendCode" :disabled="!!codeTimer">{{codeTimer ? `剩余${codeTimeSeconds秒}` : '获取验证码'}}</el-button>
+            <el-button @click="handleSendCode" :disabled="!!codeTimer">{{codeTimer ? `剩余${codeTimeSeconds}秒` : '获取验证码'}}</el-button>
           </el-col>
         </el-form-item>
         <el-form-item prop="agree">
@@ -48,11 +48,11 @@ export default {
       rules: {
         mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
-          { pattern: /^d{11}&/, message: '请输入有效的手机号', trigger: 'blur' }
+          { pattern: /^\d{11}$/, message: '请输入有效的手机号', trigger: 'blur' }
         ],
         code: [
           { required: true, message: '请输入验证码', trigger: 'blur' },
-          { pattern: /^d{6}&/, message: '请输入有效的验证码', trigger: 'blur' }
+          { pattern: /^\d{6}$/, message: '请输入有效的验证码', trigger: 'blur' }
         ],
         agree: [
           { required: true, message: '请同意用户协议' },
