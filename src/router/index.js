@@ -44,6 +44,9 @@ router.beforeEach((to, from, next) => {
     // 非登录页面
     // 如果没有登录，跳转到登陆页面，登录了，允许通过
     if (!userInfo) {
+      if (from.path === '/login') {
+        nprogress.done()
+      }
       next({ name: 'login' })
     } else {
       next()

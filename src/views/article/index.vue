@@ -21,21 +21,46 @@
       </div>
       <el-table
         class="article-list"
-        :data="tableData"
-        style="width: 100%">
+        :data="articles"
+        style="width: 100%"
+        v-loading="articleLoading">
+        <!-- v-loading 自定义指令 -->
         <el-table-column
-          prop="date"
-          label="日期"
+          label="封面"
+          width="180">
+           <!--
+            template 中的内容就是自定义表格列内容
+            如果需要在 template 中访问遍历项数据，则需要给 template 配置 slot-scope="scope"
+              slot-scope 属性名是固定的
+              scope 值是自己随便起的名字
+            结果就是：我们可以通过 scope.row 访问到当前遍历项对象，就好比我们遍历中的 item 一样
+           -->
+          <template slot-scope='scope'>
+            <img :src="item"
+            width='20'
+            v-for='item in scope.row.cover.images'
+            :key='item'>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="title"
+          label="标题"
+          width="180">
+        <template slot-scope="scope">
+            <el-tag :type="statTypes[scope.row.status].type">{{ statTypes[scope.row.status].label }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="pubdate"
+          label="发布时间"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="name"
-          label="姓名"
-          width="180">
-        </el-table-column>
-        <el-table-column
-          prop="address"
-          label="地址">
+          label="操作">
+          <template>
+            <el-button size="mini" type="primary" plain>修改</el-button>
+            <el-button size="mini" type="danger" plain>删除</el-button>
+          </template>
         </el-table-column>
       </el-table>
 
@@ -43,7 +68,10 @@
       <el-pagination
         background
         layout="prev, pager, next"
-        :total="1000">
+        :pagesize="pageSize"
+        :total='totalCount'
+        :disabled='articleLoading'
+        @current-change='handleCurrentChange'>
       </el-pagination>
       <!-- /数据分页 -->
     </el-card>
@@ -57,23 +85,33 @@ export default {
   props: [''],
   data () {
     return {
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }]
+      articles: [],
+      statTypes: [
+        {
+          type: 'info',
+          label: '草稿'
+        },
+        {
+          type: '',
+          label: '待审核'
+        },
+        {
+          type: 'success',
+          label: '审核通过'
+        },
+        {
+          type: 'warning',
+          label: '审核失败'
+        },
+        {
+          type: 'danger',
+          label: '已删除'
+        }
+      ],
+      pageSize: 10,
+      totalCount: 0,
+      page: 1, // 当前页码
+      articleLoading: false // 加载中
     }
   },
 
@@ -93,9 +131,19 @@ export default {
     async loadArticles () {
       const data = await this.$http({
         method: 'GET',
-        url: '/articles'
+        url: '/articles',
+        params: {
+          page: this.page,
+          per_page: this.pageSize
+        }
       })
-      console.log(data)
+      this.articles = data.results
+      this.totalCount = data.total_count
+      this.articleLoading = false
+    },
+    handleCurrentChange (page) {
+      this.page = page
+      this.loadArticles()
     }
   },
 
