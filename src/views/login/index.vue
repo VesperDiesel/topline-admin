@@ -85,12 +85,11 @@ export default {
     },
     async submitLogin () {
       try {
-        const res = await this.$http({
+        const userInfo = await this.$http({
           method: 'POST',
           url: '/authorizations',
           data: this.form
         })
-        const userInfo = res.data.data
         saveUser(userInfo)
         this.$message({
           message: '登录成功',
@@ -113,11 +112,10 @@ export default {
     },
     async showGeetest () {
       const { mobile } = this.form
-      const res = await this.$http({
+      const data = await this.$http({
         method: 'GET',
         url: `/captchas/${mobile}`
       })
-      const { data } = res.data
       // 目前提供四种展现形式
 
       // popup（弹出式）

@@ -52,7 +52,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'ArticleList',
   props: [''],
@@ -82,11 +81,23 @@ export default {
 
   computed: {},
 
+  created () {
+    this.loadArticles()
+  },
+
   beforeMount () {},
 
   mounted () {},
 
-  methods: {},
+  methods: {
+    async loadArticles () {
+      const data = await this.$http({
+        method: 'GET',
+        url: '/articles'
+      })
+      console.log(data)
+    }
+  },
 
   watch: {}
 
