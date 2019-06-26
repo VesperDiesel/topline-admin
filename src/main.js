@@ -6,7 +6,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import 'nprogress/nprogress.css'
 import axios from 'axios'
 import App from './App.vue'
-import { getUser } from '@/utils/auth'
+import { getUser, removeUser } from '@/utils/auth'
 
 // axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/mp/v1_0'
 axios.defaults.baseURL = 'http://toutiao.course.itcast.cn/mp/v1_0'
@@ -31,6 +31,12 @@ axios.interceptors.response.use(response => {
     return response.data
   }
 }, error => {
+  if (error.response.status === 401) {
+    removeUser()
+    router.push({
+      name: 'login'
+    })
+  }
   return Promise.reject(error)
 })
 
