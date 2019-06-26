@@ -16,7 +16,8 @@
             <el-input v-model="form.code" placeholder="验证码"></el-input>
           </el-col>
           <el-col :offset="1" :span="9">
-            <el-button @click="handleSendCode" :disabled="!!codeTimer">{{codeTimer ? `剩余${codeTimeSeconds}秒` : '获取验证码'}}</el-button>
+            <el-button @click="handleSendCode" :disabled="!!codeTimer"
+            :loading='codeLoading'>{{codeTimer ? `剩余${codeTimeSeconds}秒` : '获取验证码'}}</el-button>
           </el-col>
         </el-form-item>
         <el-form-item prop="agree">
@@ -24,7 +25,7 @@
           <span class="agree-text">我已阅读并同意<a href="#">用户协议</a>和<a href="#">隐私条款</a></span>
         </el-form-item>
         <el-form-item>
-          <el-button class="btn-login" type="primary" @click="handleLogin">登录</el-button>
+          <el-button class="btn-login" type="primary" @click="handleLogin" :loading="loginLoading">登录</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -62,7 +63,9 @@ export default {
         ]
       },
       codeTimer: null,
-      codeTimeSeconds: initCodeTimeSeconds
+      codeTimeSeconds: initCodeTimeSeconds,
+      loginLoading: false,
+      codeLoading: false
     }
   },
 
@@ -84,6 +87,7 @@ export default {
       })
     },
     async submitLogin () {
+      this.loginLoading = true
       try {
         const userInfo = await this.$http({
           method: 'POST',
@@ -101,6 +105,7 @@ export default {
       } catch (err) {
         this.$message.error('登录失败，手机号或验证码错误')
       }
+      this.loginLoading = false
     },
     handleSendCode () {
       this.$refs['form'].validateField('mobile', errorMessage => {
@@ -111,50 +116,61 @@ export default {
       })
     },
     async showGeetest () {
-      const { mobile } = this.form
-      const data = await this.$http({
-        method: 'GET',
-        url: `/captchas/${mobile}`
-      })
-      // 目前提供四种展现形式
+      try {
+        this.codeLoading = true
+        const { mobile } = this.form
+        const data = await this.$http({
+          method: 'GET',
+          url: `/captchas/${mobile}`
+        })
+        // 目前提供四种展现形式
 
-      // popup（弹出式）
+        // popup（弹出式）
 
-      // float（浮动式）、
+        // float（浮动式）、
 
-      // custom（与popup类似，但是可以自定义弹出区域）、
+        // custom（与popup类似，但是可以自定义弹出区域）、
 
-      // bind（隐藏按钮类型）。
-      const captchaObj = await initGeetest({
+        // bind（隐藏按钮类型）。
+        const captchaObj = await initGeetest({
         // 以下配置参数来自服务端 SDK
-        gt: data.gt,
-        challenge: data.challenge,
-        offline: !data.success,
-        new_captcha: data.new_captcha,
-        product: 'bind' // 隐藏，直接弹出式
-      })
-      captchaObj.onReady(() => {
-        // 验证码ready之后才能调用verify方法显示验证码
-        captchaObj.verify() // 弹出验证码内容框
-      }).onSuccess(async () => {
+          gt: data.gt,
+          challenge: data.challenge,
+          offline: !data.success,
+          new_captcha: data.new_captcha,
+          product: 'bind' // 隐藏，直接弹出式
+        })
+        captchaObj.onReady(() => {
+          this.codeLoading = false
+          // 验证码ready之后才能调用verify方法显示验证码
+          captchaObj.verify() // 弹出验证码内容框
+        }).onSuccess(async () => {
         // your code
         // console.log(captchaObj.getValidate())
-        const {
-          geetest_challenge: challenge,
-          geetest_seccode: seccode,
-          geetest_validate: validate
-        } = captchaObj.getValidate()
-        await this.$http({
-          method: 'GET',
-          url: `/sms/codes/${mobile}`,
-          params: {
-            challenge,
-            validate,
-            seccode
+          try {
+            const {
+              geetest_challenge: challenge,
+              geetest_seccode: seccode,
+              geetest_validate: validate
+            } = captchaObj.getValidate()
+            await this.$http({
+              method: 'GET',
+              url: `/sms/codes/${mobile}`,
+              params: {
+                challenge,
+                validate,
+                seccode
+              }
+            })
+          } catch (err) {
+            this.$message.error('获取验证码失败')
+            this.codeLoading = false
           }
         })
-        this.codeCountDown()
-      })
+      } catch (err) {
+        this.$message.error('获取验证码失败')
+        this.codeLoading = false
+      }
     },
     codeCountDown () {
       this.codeTimer = window.setInterval(() => {
