@@ -32,9 +32,10 @@
 </template>
 
 <script>
-import axios from 'axios'
-import '@/vendor/gt'
+// import axios from 'axios'
+// import '@/vendor/gt'
 import { saveUser } from '@/utils/auth'
+import initGeetest from '@/utils/init-geetest'
 const initCodeTimeSeconds = 60
 export default {
   name: 'AppLogin',
@@ -82,13 +83,13 @@ export default {
         this.submitLogin()
       })
     },
-    submitLogin () {
-      axios({
-        method: 'POST',
-        url: 'http://ttapi.research.itcast.cn/mp/v1_0/authorizations',
-        data: this.form
-      }).then(res => {
-        // console.log(res.data)
+    async submitLogin () {
+      try {
+        const res = await this.$http({
+          method: 'POST',
+          url: '/authorizations',
+          data: this.form
+        })
         const userInfo = res.data.data
         saveUser(userInfo)
         this.$message({
@@ -98,9 +99,9 @@ export default {
         this.$router.push({
           name: 'home'
         })
-      }).catch((e) => {
+      } catch (err) {
         this.$message.error('登录失败，手机号或验证码错误')
-      })
+      }
     },
     handleSendCode () {
       this.$refs['form'].validateField('mobile', errorMessage => {
@@ -110,59 +111,51 @@ export default {
         this.showGeetest()
       })
     },
-    showGeetest () {
+    async showGeetest () {
       const { mobile } = this.form
-      axios({
+      const res = await this.$http({
         method: 'GET',
-        url: `http://ttapi.research.itcast.cn/mp/v1_0/captchas/${mobile}`
-      }).then(res => {
-        const { data } = res.data
-        // 目前提供四种展现形式
+        url: `/captchas/${mobile}`
+      })
+      const { data } = res.data
+      // 目前提供四种展现形式
 
-        // popup（弹出式）
+      // popup（弹出式）
 
-        // float（浮动式）、
+      // float（浮动式）、
 
-        // custom（与popup类似，但是可以自定义弹出区域）、
+      // custom（与popup类似，但是可以自定义弹出区域）、
 
-        // bind（隐藏按钮类型）。
-        window.initGeetest({
-          // 以下配置参数来自服务端 SDK
-          gt: data.gt,
-          challenge: data.challenge,
-          offline: !data.success,
-          new_captcha: data.new_captcha,
-          product: 'bind' // 隐藏，直接弹出式
-        }, captchaObj => {
-          captchaObj.onReady(() => {
-            // 验证码ready之后才能调用verify方法显示验证码
-            captchaObj.verify() // 弹出验证码内容框
-          }).onSuccess(() => {
-            // your code
-            // console.log(captchaObj.getValidate())
-            const {
-              geetest_challenge: challenge,
-              geetest_seccode: seccode,
-              geetest_validate: validate
-            } = captchaObj.getValidate()
-            axios({
-              method: 'GET',
-              url: `http://ttapi.research.itcast.cn/mp/v1_0/sms/codes/${mobile}`,
-              params: {
-                challenge,
-                validate,
-                seccode
-              }
-            }).then(res => {
-              // console.log(res.data)
-              this.codeCountDown()
-            })
-          }).onError(function () {
-            // your code
-          })
-          // 在这里注册 “发送验证码” 按钮的点击事件，然后验证用户是否输入手机号以及手机号格式是否正确，没有问题：
-          // captchaObj.verify
+      // bind（隐藏按钮类型）。
+      const captchaObj = await initGeetest({
+        // 以下配置参数来自服务端 SDK
+        gt: data.gt,
+        challenge: data.challenge,
+        offline: !data.success,
+        new_captcha: data.new_captcha,
+        product: 'bind' // 隐藏，直接弹出式
+      })
+      captchaObj.onReady(() => {
+        // 验证码ready之后才能调用verify方法显示验证码
+        captchaObj.verify() // 弹出验证码内容框
+      }).onSuccess(async () => {
+        // your code
+        // console.log(captchaObj.getValidate())
+        const {
+          geetest_challenge: challenge,
+          geetest_seccode: seccode,
+          geetest_validate: validate
+        } = captchaObj.getValidate()
+        await this.$http({
+          method: 'GET',
+          url: `/sms/codes/${mobile}`,
+          params: {
+            challenge,
+            validate,
+            seccode
+          }
         })
+        this.codeCountDown()
       })
     },
     codeCountDown () {
