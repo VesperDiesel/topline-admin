@@ -8,8 +8,8 @@ import axios from 'axios'
 import App from './App.vue'
 import { getUser, removeUser } from '@/utils/auth'
 
-// axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/mp/v1_0'
-axios.defaults.baseURL = 'http://toutiao.course.itcast.cn/mp/v1_0'
+axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/mp/v1_0'
+// axios.defaults.baseURL = 'http://toutiao.course.itcast.cn/mp/v1_0'
 
 // axios请求拦截器,axios发送的请求回先经过这里，可以在此进行一些逻辑操作
 axios.interceptors.request.use(config => {
