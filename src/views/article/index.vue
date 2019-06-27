@@ -142,7 +142,8 @@ export default {
         channel_id: '',
         begin_pubdate: '',
         end_pubdate: ''
-      }
+      },
+      channels: []
     }
   },
 
@@ -152,6 +153,7 @@ export default {
 
   created () {
     this.loadArticles()
+    this.loadChannels()
   },
 
   beforeMount () {},
@@ -159,6 +161,18 @@ export default {
   mounted () {},
 
   methods: {
+    async loadChannels () {
+      try {
+        const data = await this.$http({
+          method: 'GET',
+          url: '/channels'
+        })
+        this.channels = data.channels
+      } catch (err) {
+        console.log(err)
+        this.$message.err('获取频道数据失败')
+      }
+    },
     onSubmit () {},
     async loadArticles () {
       const data = await this.$http({

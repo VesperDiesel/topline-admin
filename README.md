@@ -28,4 +28,4 @@ npm run lint
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
-<!-- 246180万能验证码 -->
+<!-- 246810万能验证码 -->
