@@ -84,9 +84,9 @@
         </el-table-column>
         <el-table-column
           label="操作">
-          <template>
+          <template slot-scope="scope">
             <el-button size="mini" type="primary" plain>修改</el-button>
-            <el-button size="mini" type="danger" plain>删除</el-button>
+            <el-button size="mini" type="danger" plain @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -165,6 +165,9 @@ export default {
   mounted () {},
 
   methods: {
+    handleDelete (item) {
+      console.log(item.id.toString())
+    },
     handleDateChange (value) {
       // console.log(value) 一个数组，里面是起始和终止时间
       this.filterParams.begin_pubdate = value[0]
