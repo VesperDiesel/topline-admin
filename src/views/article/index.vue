@@ -17,10 +17,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="频道">
-          <el-select v-model="filterParams.channel_id" placeholder="请选择活动区域">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
+         <article-channel v-model="filterParams.channel_id"></article-channel>
         </el-form-item>
         <el-form-item label="时间">
           <el-date-picker
@@ -108,8 +105,14 @@
 </template>
 
 <script>
+
+import AticleChannel from '@/components/article-channel'
+
 export default {
   name: 'ArticleList',
+  comments: {
+    AticleChannel
+  },
   props: [''],
   data () {
     return {
@@ -146,8 +149,7 @@ export default {
         begin_pubdate: '',
         end_pubdate: ''
       },
-      range_date: '',
-      channels: []
+      range_date: ''
     }
   },
 
@@ -157,7 +159,6 @@ export default {
 
   created () {
     this.loadArticles()
-    this.loadChannels()
   },
 
   beforeMount () {},
@@ -172,18 +173,6 @@ export default {
       // console.log(value) 一个数组，里面是起始和终止时间
       this.filterParams.begin_pubdate = value[0]
       this.filterParams.end_pubdate = value[1]
-    },
-    async loadChannels () {
-      try {
-        const data = await this.$http({
-          method: 'GET',
-          url: '/channels'
-        })
-        this.channels = data.channels
-      } catch (err) {
-        console.log(err)
-        this.$message.err('获取频道数据失败')
-      }
     },
     handleFilter () {
       this.page = 1
