@@ -183,6 +183,7 @@ export default {
           type: 'success',
           message: '删除成功'
         })
+        // this.totalCount -= 1
         this.loadArticles()
       } catch (err) {
         if (err === 'cancel') {
@@ -221,6 +222,7 @@ export default {
               ...filterData
             }
           })
+          // console.log(data)
           this.articles = data.results
           this.totalCount = data.total_count
           this.articleLoading = false
