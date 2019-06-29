@@ -67,11 +67,28 @@ export default {
 
   computed: {},
 
-  beforeMount () {},
-
-  mounted () {},
+  created () {
+    if (this.$route.name === 'publish-edit') {
+      console.log(2134)
+      this.loadArticle()
+    }
+  },
 
   methods: {
+    async loadArticle () {
+      try {
+        const data = await this.$http({
+          method: 'GET',
+          url: `/articles/${this.$route.params.id}`
+        })
+        console.log(234)
+        console.log(data)
+        this.articleForm = data
+      } catch (err) {
+        console.log(err)
+        this.$message.err('获取文章失败')
+      }
+    },
     async handlePublish (draft) {
       try {
         await this.$http({
