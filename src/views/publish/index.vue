@@ -18,15 +18,11 @@
             <el-input type="textarea" v-model="articleForm.content"></el-input>
           </el-form-item>
           <el-form-item label="封面">
-            <!-- <el-radio-group>
-              <el-radio label="线上品牌商赞助"></el-radio>
-              <el-radio label="线下场地免费"></el-radio>
-            </el-radio-group> -->
           </el-form-item>
           <el-form-item label="频道">
             <article-channel v-model="articleForm.channel_id"></article-channel>
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+              <!-- <el-option label="区域一" value="shanghai"></el-option>
+              <el-option label="区域二" value="beijing"></el-option> -->
           </el-form-item>
         </el-form>
         <!-- /表单 -->

@@ -1,5 +1,5 @@
 <template>
- <el-select clearable :value="value" @change="$emit('input', $event)">
+ <el-select clearable :value="value" @change="handleChange">
     <el-option
       v-for="item in channels"
       :key="item.id"
@@ -24,8 +24,6 @@ export default {
       channels: []
     }
   },
-
-  components: {},
 
   computed: {},
 
@@ -56,5 +54,5 @@ export default {
 }
 
 </script>
-<style lang='' scoped>
+<style lang='less' scoped>
 </style>

@@ -70,6 +70,10 @@
           prop="title"
           label="标题"
           width="180">
+        </el-table-column>
+        <el-table-column
+        label="状态"
+          width="180">
         <template slot-scope="scope">
             <el-tag :type="statTypes[scope.row.status].type">{{ statTypes[scope.row.status].label }}</el-tag>
           </template>
@@ -106,12 +110,12 @@
 
 <script>
 
-import AticleChannel from '@/components/article-channel'
+import ArticleChannel from '@/components/article-channel'
 
 export default {
   name: 'ArticleList',
-  comments: {
-    AticleChannel
+  components: {
+    ArticleChannel
   },
   props: [''],
   data () {
@@ -153,8 +157,6 @@ export default {
     }
   },
 
-  components: {},
-
   computed: {},
 
   created () {
@@ -166,8 +168,31 @@ export default {
   mounted () {},
 
   methods: {
-    handleDelete (item) {
-      console.log(item.id.toString())
+    async handleDelete (item) {
+      try {
+        await this.$confirm('此操作将永久删除该文件，是否继续？', '提示', {
+          comfirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        await this.$http({
+          method: 'DELETE',
+          url: `/articles/${item.id}`
+        })
+        this.$message({
+          type: 'success',
+          message: '删除成功'
+        })
+        this.loadArticles()
+      } catch (err) {
+        if (err === 'cancel') {
+          return this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        }
+        this.$message.error('删除失败')
+      }
     },
     handleDateChange (value) {
       // console.log(value) 一个数组，里面是起始和终止时间
@@ -179,26 +204,30 @@ export default {
       this.loadArticles()
     },
     async loadArticles () {
-      this.articleLoading = true
-      const filterData = {}
-      for (let key in this.filterParams) {
-        const item = this.filterParams[key]
-        if (item !== null && item !== undefined && item !== '') {
-          filterData[key] = item
+      try {
+        this.articleLoading = true
+        const filterData = {}
+        for (let key in this.filterParams) {
+          const item = this.filterParams[key]
+          if (item !== null && item !== undefined && item !== '') {
+            filterData[key] = item
+          }
+          const data = await this.$http({
+            method: 'GET',
+            url: '/articles',
+            params: {
+              page: this.page,
+              per_page: this.pageSize,
+              ...filterData
+            }
+          })
+          this.articles = data.results
+          this.totalCount = data.total_count
+          this.articleLoading = false
         }
+      } catch (err) {
+        this.$message.error('加载文章列表失败', err)
       }
-      const data = await this.$http({
-        method: 'GET',
-        url: '/articles',
-        params: {
-          page: this.page,
-          per_page: this.pageSize,
-          ...filterData
-        }
-      })
-      this.articles = data.results
-      this.totalCount = data.total_count
-      this.articleLoading = false
     },
     handleCurrentChange (page) {
       this.page = page
