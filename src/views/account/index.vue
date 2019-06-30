@@ -102,7 +102,7 @@ export default {
     async handleSave () {
       try {
         const { name, intro, email } = this.user
-        await this.$http({
+        const data = await this.$http({
           method: 'PATCH',
           url: '/user/profile',
           data: {
@@ -115,6 +115,8 @@ export default {
           type: 'success',
           message: '保存修改成功'
         })
+        // 提交 mutation，也就是调用 mutation 函数
+        this.$store.commit('changeUser', data)
         this.$router.push({
           name: 'home'
         })
@@ -139,7 +141,7 @@ export default {
           data: formData
         })
         console.log(data)
-        this.user.photo = data.photo
+        this.$store.commit('changeUser', this.user)
         this.$message({
           type: 'success',
           message: '修改头像成功'
