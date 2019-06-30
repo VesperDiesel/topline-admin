@@ -4,7 +4,7 @@
     <el-col :span="5" :offset="5">
       <el-dropdown trigger="click" @command='handleCommand'>
         <span class="el-dropdown-link">
-          <img width="30" src="userInfo.photo">
+          <img width="30" :src="$store.state.userInfo.photo">
           {{userInfo.name}}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
