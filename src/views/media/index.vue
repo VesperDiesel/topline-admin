@@ -13,12 +13,12 @@
 
     <!-- 图片列表 -->
     <el-row :gutter="20">
-      <el-col :span="4" v-for="(o) in 12" :key="o" style="margin-bottom: 10px;">
+      <el-col :span="4" v-for="item in images" :key="item.id" style="margin-bottom: 10px;">
         <el-card :body-style="{ padding: '0px' }">
-          <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" class="image">
+          <img :src="item.url" class="image" style='style="max-width: 100%;'>
           <div style="padding: 10px;">
             <div class="bottom clearfix">
-              <el-button plain type="primary" icon="el-icon-star-off" circle></el-button>
+              <el-button plain type="primary" :icon="item.is_collected ? 'el-icon-star-on' :' el-icon-star-off'" circle></el-button>
               <el-button plain type="primary" icon="el-icon-delete" circle></el-button>
             </div>
           </div>
@@ -35,7 +35,8 @@ export default {
   props: [''],
   data () {
     return {
-      active: '全部'
+      active: '全部',
+      images: []
     }
   },
 
@@ -43,13 +44,33 @@ export default {
 
   computed: {},
 
-  created () {},
+  created () {
+    this.loadImages()
+  },
 
   beforeMount () {},
 
   mounted () {},
 
-  methods: {},
+  methods: {
+    async loadImages (collect = false) {
+      try {
+        const data = await this.$http({
+          method: 'GET',
+          url: '/user/images',
+          params: {
+            collect,
+            page: 1,
+            per_page: 10
+          }
+        })
+        this.images = data.results
+      } catch (err) {
+        console.log(err)
+        this.$message.error('加载图片列表失败')
+      }
+    }
+  },
 
   watch: {}
 
