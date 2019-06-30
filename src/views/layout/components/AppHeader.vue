@@ -1,11 +1,11 @@
 <template>
  <el-row :gutter="20">
-    <el-col :span="10">江苏传智播客教育科技股份有限公司</el-col>
-    <el-col :span="5" :offset="5">
+    <el-col :span="10" class="title">江苏传智播客教育科技股份有限公司</el-col>
+    <el-col :span="5" :offset="5" class="image">
       <el-dropdown trigger="click" @command='handleCommand'>
         <span class="el-dropdown-link">
-          <img width="30" :src="userInfo.photo">
-          {{userInfo.name}}<i class="el-icon-arrow-down el-icon--right"></i>
+          <img width="30" :src="$store.state.user.photo">
+          {{$store.state.user.name}}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command='a'>用户设置</el-dropdown-item>
@@ -17,17 +17,17 @@
 </template>
 
 <script>
-import { removeUser, getUser } from '@/utils/auth'
+import { removeUser } from '@/utils/auth'
 export default {
   name: 'AppHeader',
   props: [''],
   data () {
     return {
-      userInfo: {}
+      // userInfo: {}
     }
   },
   created () {
-    this.userInfo = getUser()
+    // this.userInfo = getUser()
   },
   components: {},
 
@@ -64,5 +64,15 @@ export default {
 }
 </script>
 
-<style lang='' scoped>
+<style lang='less' scoped>
+.title {
+  // vertical-align: middle;
+  line-height:60px;
+}
+.image {
+  line-height:60px;
+  img {
+    vertical-align: middle;
+  }
+}
 </style>
